@@ -1,12 +1,14 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func check(e error) {
@@ -14,39 +16,57 @@ func check(e error) {
 		fmt.Println(e)
 	}
 }
+var(
+	port string
+	view string
+	viewHelpText string
+	htmlMap map[string]string
+)
+
+func init(){
+	htmlMap =  make(map[string]string)
+
+	files, err := ioutil.ReadDir("./html")
+    if err != nil {
+        fmt.Println("Error:", err)
+        os.Exit(1)
+    }
+    var fileName string
+    for _, file := range files {
+        if file.IsDir() {
+            fmt.Println(file.Name()+" is a directory")
+        } else {
+			//分割字符取第一个
+			fileName = strings.Split(file.Name(),".")[0]
+			viewHelpText = viewHelpText + fileName + "\t"
+            htmlMap[fileName] = file.Name()
+        }
+    }
+	viewHelpText = viewHelpText + "\ndisplay *.html"
+}
+
 
 func main() {
+	flag.StringVar(&port, "p", "9000", "port example: -p 9000;端口 例子: -p 9000")
+	flag.StringVar(&view, "v", "simple",viewHelpText)
+
+	flag.Parse()
 	fmt.Println("请访问下面的链接:")
 	showip()
 	http.HandleFunc("/", uploadFileHandler)
 	http.Handle("/file/", http.StripPrefix("/file/", http.FileServer(http.Dir("/home/m2/upfile/filesDir"))))
-	http.ListenAndServe(":9000", nil)
+	http.ListenAndServe(":"+port, nil)
 }
+func nameToView(view string)string{
+	content ,err := ioutil.ReadFile("./html/"+view)
+	if err != nil {
+        panic(err)
+    }
+    return string(content)
+}
+
 func uploadFileHandler(w http.ResponseWriter, r *http.Request) {
-	/**/
-	fmt.Fprintln(w, `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta name="viewport" charset="UTF-8" content="width=device-width, initial-scale=1.0">
-    <title>m的二次方文件上传</title>
-</head>
-<body style="text-align: center;"> 
-    <h1>m的二次方文件上传</h1>
-    <br>
-    <br>
-    <form action="UploadFile.ashx" method="post" enctype="multipart/form-data">
-    <input type="file" name="file_uploads" id="file_uploads" multiple/>
-    <input type="submit" name="上传文件"/>
-    </form>
-        <br>
-    <br>
-        <br>
-    <br>
-    <a href="/file">文件下载</a>
-</body>
-</html>
-        `)
+	fmt.Fprintln(w, nameToView(htmlMap[view]))
 	uploadOne(w, r)
 }
 
@@ -108,7 +128,7 @@ func showip() {
 		// 检查ip地址判断是否回环地址
 		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
 			if ipnet.IP.To4() != nil {
-				fmt.Println(ipnet.IP.String() + ":9000")
+				fmt.Println(ipnet.IP.String() + ":" + port)
 			}
 		}
 	}
