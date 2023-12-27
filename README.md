@@ -25,3 +25,13 @@ goshare
 ```
 goshare --help
 ```
+
+### update
+
+```shell
+rm $GOPATH/bin/goshare
+```
+
+```shell
+go install https://github.com/CodeCrafters-Community/goshare@latest
+```
