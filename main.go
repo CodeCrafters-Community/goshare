@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/user"
 	"strings"
 )
 
@@ -24,6 +25,7 @@ var(
 	port string
 	view string
 	viewHelpText string
+	path string
 	htmlMap map[string]string
 )
 
@@ -51,14 +53,24 @@ func init(){
 
 
 func main() {
+	currentUser, err := user.Current()
+    if err != nil {
+       log.Fatalf(err.Error())
+    }
+	
+	err = os.MkdirAll(currentUser.HomeDir+"/Desktop/upfile",os.ModePerm)
+	if err!=nil{
+		log.Fatal(err)
+	}
 	flag.StringVar(&port, "p", "9000", "port example: -p 9000;端口 例子: -p 9000")
 	flag.StringVar(&view, "v", "simple",viewHelpText)
+	flag.StringVar(&path, "P", currentUser.HomeDir+"/Desktop/upfile","download/upload directory 下载/上传目录")
 
 	flag.Parse()
 	fmt.Println("请访问下面的链接:")
 	showip()
 	http.HandleFunc("/", uploadFileHandler)
-	http.Handle("/file/", http.StripPrefix("/file/", http.FileServer(http.Dir("/home/m2/upfile/filesDir"))))
+	http.Handle("/file/", http.StripPrefix("/file/", http.FileServer(http.Dir(path))))
 	http.ListenAndServe(":"+port, nil)
 }
 func nameToView(view string)string{
@@ -81,14 +93,14 @@ func uploadOne(w http.ResponseWriter, r *http.Request) {
 		defer file.Close()
 		fileBytes, err := ioutil.ReadAll(file)
 		check(err)
-		newFile, err := os.Create("/home/m2/upfile/filesDir/" + handler.Filename)
+		newFile, err := os.Create(path + "/" + handler.Filename)
 		check(err)
 		defer newFile.Close()
 		if _, err := newFile.Write(fileBytes); err != nil {
 			check(err)
 			return
 		}
-		fmt.Println(" upload successfully:" + "/home/m2/upfile/filesDir/" + handler.Filename)
+		fmt.Println(" upload successfully:" + path + "/" + handler.Filename)
 		w.Write([]byte("SUCCESS"))
 	}
 }
@@ -109,15 +121,15 @@ func uploadMore(w http.ResponseWriter, r *http.Request) {
 			check(err)
 
 			//创建上传文件
-			cur, err := os.Create("/home/m2/upfile/filesDir/" + fileItem.Filename)
-			fmt.Println("上传地址:/home/m2/upfile/filesDir/")
+			cur, err := os.Create(path + "/" + fileItem.Filename)
+			fmt.Println("上传地址:path/")
 			check(err)
 			defer cur.Close()
 			if _, err := cur.Write(fileBytes); err != nil {
 				check(err)
 				return
 			}
-			fmt.Println(" upload successfully:" + "/home/m2/upfile/filesDir/" + fileItem.Filename)
+			fmt.Println(" upload successfully:" + path + "/" + fileItem.Filename)
 			w.Write([]byte("SUCCESS"))
 		}
 	}
