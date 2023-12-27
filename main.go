@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -10,6 +11,9 @@ import (
 	"os"
 	"strings"
 )
+
+//go:embed html
+var _  embed.FS
 
 func check(e error) {
 	if e != nil {
