@@ -49,7 +49,6 @@ func init(){
         }
     }
 	viewHelpText = viewHelpText + "\ndisplay *.html"
-	fmt.Println(os.Getwd())
 }
 
 
@@ -66,7 +65,7 @@ func main() {
 	flag.StringVar(&port, "p", "9000", "port example: -p 9000;端口 例子: -p 9000")
 	flag.StringVar(&view, "v", "simple",viewHelpText)
 	flag.StringVar(&path, "P", currentUser.HomeDir+"/Desktop/upfile","download/upload directory 下载/上传目录")
-
+	fmt.Println("默认上传/下载路径：\t"+currentUser.HomeDir+"/Desktop/upfile")
 	flag.Parse()
 	fmt.Println("请访问下面的链接:")
 	showip()
@@ -145,7 +144,7 @@ func showip() {
 		// 检查ip地址判断是否回环地址
 		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
 			if ipnet.IP.To4() != nil {
-				fmt.Println(ipnet.IP.String() + ":" + port)
+				fmt.Println("http://"+ipnet.IP.String() + ":" + port)
 			}
 		}
 	}
