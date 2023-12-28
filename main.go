@@ -13,8 +13,8 @@ import (
 	"strings"
 )
 
-//go:embed html
-var _  embed.FS
+//go:embed html/*
+var multi  embed.FS
 
 func check(e error) {
 	if e != nil {
@@ -32,7 +32,7 @@ var(
 func init(){
 	htmlMap =  make(map[string]string)
 
-	files, err := ioutil.ReadDir("./html")
+	files, err := multi.ReadDir("html")
     if err != nil {
         fmt.Println("Error:", err)
         os.Exit(1)
@@ -49,6 +49,7 @@ func init(){
         }
     }
 	viewHelpText = viewHelpText + "\ndisplay *.html"
+	fmt.Println(os.Getwd())
 }
 
 
@@ -74,7 +75,7 @@ func main() {
 	http.ListenAndServe(":"+port, nil)
 }
 func nameToView(view string)string{
-	content ,err := ioutil.ReadFile("./html/"+view)
+	content ,err := multi.ReadFile("html/"+view)
 	if err != nil {
         panic(err)
     }
