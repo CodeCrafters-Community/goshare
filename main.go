@@ -109,7 +109,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		go writeFile(&wg, create, open)
 		wg.Wait()
 		fmt.Println(" upload successfully:" + path + "/" + file.Filename)
-		w.Write([]byte("</br></br>" + file.Filename + "&nbsp;SUCCESS</br>"))
+		w.Write([]byte(file.Filename + "&nbsp;<span style='color:#00DB00'>SUCCESS</span></br>"))
 	}
 }
 
