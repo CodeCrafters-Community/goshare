@@ -1,5 +1,8 @@
 # goshare
 
+### What is goshare?
+this is a simple file transmission tool.
+
 ### install
 
 ```shell
