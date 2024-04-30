@@ -73,7 +73,10 @@ func main() {
 	showIp()
 	http.HandleFunc("/", uploadFileHandler)
 	http.Handle("/file/", http.StripPrefix("/file/", http.FileServer(http.Dir(path))))
-	http.ListenAndServe(":"+port, nil)
+	err = http.ListenAndServe(":"+port, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 func nameToView(view string) string {
 	content, err := multi.ReadFile("html/" + view)
