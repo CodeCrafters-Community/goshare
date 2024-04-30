@@ -6,7 +6,7 @@
 go install https://github.com/CodeCrafters-Community/goshare@latest
 ```
 
-### user
+### use
 
 > add you <$GOPATH/bin> to env
 
@@ -14,6 +14,10 @@ macos
 
 ```shell
 echo "export PATH=$GOPATH/bin:$PATH:." >> ~/.bash_profile && source ~/.bash_profile
+```
+windows and linux
+```
+Refer to macos
 ```
 
 ### run
